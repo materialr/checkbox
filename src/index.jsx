@@ -2,6 +2,7 @@ import rippleFoundation from '@materialr/ripple';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
+import uuidv1 from 'uuid/v1';
 
 import '@material/checkbox/mdc-checkbox.scss';
 
@@ -16,7 +17,7 @@ class Checkbox extends React.Component {
     this.elementInput = undefined;
     this.elementRoot = undefined;
     this.rippleFoundation = undefined;
-    this.state = { classNames: [], classNamesRipple: [], cssVariables: {} };
+    this.state = { classNames: [], classNamesRipple: [], cssVariables: {}, id: uuidv1() };
     this.checkboxCreate = this.checkboxCreate.bind(this);
     this.checkboxDestroy = this.checkboxDestroy.bind(this);
     this.getClassNames = this.getClassNames.bind(this);
@@ -126,7 +127,7 @@ class Checkbox extends React.Component {
       rippleActivate,
       rippleDeactivate,
     } = this;
-    const id = new Date().getTime().toString();
+    const { id } = this.state;
     return (
       <Wrapper
         alignEnd={alignEnd}

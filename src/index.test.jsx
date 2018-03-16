@@ -29,6 +29,16 @@ test('Renders extra classNames that are passed in', () => {
   expect(actual).toBe(expected);
 });
 
+test('<Checkbox /> > Generates a unique id for each component', () => {
+  const wrapperFirst = mount(<Checkbox name={NAME} />);
+  const wrapperSecond = mount(<Checkbox name={NAME} />);
+
+  const actualIdFirst = wrapperFirst.find('.mdc-checkbox__native-control').props().id;
+  const actualIdsecond = wrapperSecond.find('.mdc-checkbox__native-control').props().id;
+
+  expect(actualIdFirst).not.toBe(actualIdsecond);
+});
+
 test('Does not add a ripple when it is disabled', () => {
   const wrapper = mount(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
   const expected = undefined;
