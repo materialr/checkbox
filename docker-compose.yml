@@ -4,4 +4,4 @@ services:
     build: "."
     container_name: "materialr-checkbox"
     volumes:
-      - ./:/app
+      - ./:/home/node/app
