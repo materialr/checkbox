@@ -1,259 +1,138 @@
-import rippleFoundation from '@materialr/ripple';
+import * as checkbox from '@material/checkbox';
+import * as formField from '@material/form-field';
 import { mount, shallow } from 'enzyme';
 import React from 'react';
 
-import checkboxFoundation from './foundation';
 import Checkbox from './index';
 
-const NAME = 'NAME';
+const LABEL = 'LABEL';
 
-test('Renders only default className', () => {
-  const wrapper = shallow(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
+test('Renders the default classNames', () => {
+  const wrapper = shallow(<Checkbox label={LABEL} />, { disableLifecycleMethods: true });
   const expected = 'mdc-checkbox';
 
-  const actual = wrapper.find('div').at(0).props().className;
+  const actual = wrapper.find('div').at(1).props().className;
 
   expect(actual).toBe(expected);
 });
 
-test('Renders extra classNames that are passed in', () => {
+test('Renders additional classNames from the \'className\' prop', () => {
   const CLASS_NAME = 'CLASS_NAME';
   const wrapper = shallow(
-    <Checkbox className={CLASS_NAME} name={NAME} />,
+    <Checkbox className={CLASS_NAME} label={LABEL} />,
     { disableLifecycleMethods: true },
   );
   const expected = `mdc-checkbox ${CLASS_NAME}`;
 
-  const actual = wrapper.find('div').at(0).props().className;
+  const actual = wrapper.find('div').at(1).props().className;
 
   expect(actual).toBe(expected);
 });
 
-test('<Checkbox /> > Generates a unique id for each component', () => {
-  const wrapperFirst = mount(<Checkbox name={NAME} />);
-  const wrapperSecond = mount(<Checkbox name={NAME} />);
+test('Passes the id to the input and the label', () => {
+  const ID = 'ID';
+  const wrapper = shallow(<Checkbox id={ID} label={LABEL} />, { disableLifecycleMethods: true });
+  const expectedInput = ID;
+  const expectedLabel = ID;
 
-  const actualIdFirst = wrapperFirst.find('.mdc-checkbox__native-control').props().id;
-  const actualIdsecond = wrapperSecond.find('.mdc-checkbox__native-control').props().id;
+  const actualInput = wrapper.find('input').props().id;
+  const actualLabel = wrapper.find('label').props().htmlFor;
 
-  expect(actualIdFirst).not.toBe(actualIdsecond);
+  expect(actualInput).toBe(expectedInput);
+  expect(actualLabel).toBe(expectedLabel);
 });
 
-test('Does not add a ripple when it is disabled', () => {
-  const wrapper = mount(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
-  const expected = undefined;
+test('Generates a unique id per instance if none is given', () => {
+  const wrapperOne = shallow(<Checkbox label={LABEL} />, { disableLifecycleMethods: true });
+  const wrapperTwo = shallow(<Checkbox label={LABEL} />, { disableLifecycleMethods: true });
 
-  const actual = wrapper.instance().rippleFoundation;
+  const actualOne = wrapperOne.find('input').props().id;
+  const actualTwo = wrapperTwo.find('input').props().id;
 
-  expect(actual).toBe(expected);
+  expect(actualOne).not.toBe(actualTwo);
 });
 
-test('Adds the default foundation', () => {
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
+test('Passes through the correct props', () => {
+  const DISABLED = true;
+  const NAME = 'NAME';
+  const ON_BLUR = () => 'ON_BLUR';
+  const ON_CHANGE = () => 'ON_CHANGE';
+  const ON_DRAG_START = () => 'ON_DRAG_START';
+  const ON_DROP = () => 'ON_DROP';
+  const ON_FOCUS = () => 'ON_FOCUS';
+  const wrapper = shallow(
+    <Checkbox
+      disabled={DISABLED}
+      label={LABEL}
+      name={NAME}
+      onBlur={ON_BLUR}
+      onChange={ON_CHANGE}
+      onDragStart={ON_DRAG_START}
+      onDrop={ON_DROP}
+      onFocus={ON_FOCUS}
+    />,
+    { disableLifecycleMethods: true },
+  );
+  const expectedDisabled = DISABLED;
+  const expectedLabel = LABEL;
+  const expectedName = NAME;
+  const expectedOnBlur = ON_BLUR;
+  const expectedOnChange = ON_CHANGE;
+  const expectedOnDragStart = ON_DRAG_START;
+  const expectedOnDrop = ON_DROP;
+  const expectedOnFocus = ON_FOCUS;
+
+  const inputProps = wrapper.find('input').props();
+  const actualDisabled = inputProps.disabled;
+  const actualLabel = wrapper.find('label').props().children;
+  const actualName = inputProps.name;
+  const actualOnBlur = inputProps.onBlur;
+  const actualOnChange = inputProps.onChange;
+  const actualOnDragStart = inputProps.onDragStart;
+  const actualOnDrop = inputProps.onDrop;
+  const actualOnFocus = inputProps.onFocus;
+
+  expect(actualDisabled).toBe(expectedDisabled);
+  expect(actualLabel).toBe(expectedLabel);
+  expect(actualName).toBe(expectedName);
+  expect(actualOnBlur).toBe(expectedOnBlur);
+  expect(actualOnChange).toBe(expectedOnChange);
+  expect(actualOnDragStart).toBe(expectedOnDragStart);
+  expect(actualOnDrop).toBe(expectedOnDrop);
+  expect(actualOnFocus).toBe(expectedOnFocus);
+});
+
+test('Creates the MDCFormField and MDCCheckbox component on mount', () => {
+  const MDCCheckbox = jest.fn();
+  const MDCFormField = jest.fn();
+  checkbox.MDCCheckbox = MDCCheckbox;
+  formField.MDCFormField = MDCFormField;
+  const wrapper = mount(<Checkbox label={LABEL} />);
   const instance = wrapper.instance();
-  const { elementInput, elementRoot, updateClassNames } = instance;
-  const expected = checkboxFoundation({
-    elementInput,
-    elementRoot,
-    updateClassNames,
-  });
-  expected.init();
+  const expectedCheckbox = instance.elementCheckbox;
+  const expectedFormField = instance.elementFormField;
 
-  const actual = instance.checkboxFoundation;
+  const actualCheckbox = MDCCheckbox.mock.calls[0][0];
+  const actualFormField = MDCFormField.mock.calls[0][0];
 
-  expect(JSON.stringify(actual)).toEqual(JSON.stringify(expected));
+  expect(actualCheckbox).toBe(expectedCheckbox);
+  expect(actualFormField).toBe(expectedFormField);
 });
 
-test('Destroys the default foundation when the component unmounts', () => {
-  const wrapper = mount(<Checkbox name={NAME} />);
+test('Destroys the MDCFormField component on unmount', () => {
+  const destroyCheckbox = jest.fn();
+  const destroyFormField = jest.fn();
+  const wrapper = mount(<Checkbox label={LABEL} />);
   const instance = wrapper.instance();
-  instance.checkboxDestroy = jest.fn();
+  const expectedCheckbox = 1;
+  const expectedFormField = 1;
+  instance.checkbox.destroy = destroyCheckbox;
+  instance.formField.destroy = destroyFormField;
 
   wrapper.unmount();
+  const actualCheckbox = destroyCheckbox.mock.calls.length;
+  const actualFormField = destroyFormField.mock.calls.length;
 
-  expect(instance.checkboxDestroy).toHaveBeenCalledTimes(1);
-});
-
-test('Adds a ripple when it is enabled', () => {
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
-  const { disabled } = wrapper.props();
-  const instance = wrapper.instance();
-  const { elementRoot, updateClassNames, updateCssVariables } = instance;
-  const expected = rippleFoundation({
-    centered: true,
-    disabled,
-    element: elementRoot,
-    self: instance,
-    updateClassNames,
-    updateCssVariables,
-  });
-
-  const actual = instance.rippleFoundation;
-
-  expect(JSON.stringify(actual)).toEqual(JSON.stringify(expected));
-});
-
-test('Adds the ripple if the prop changes', () => {
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  instance.rippleCreate = jest.fn();
-
-  wrapper.setProps({ rippleEnabled: true });
-
-  expect(instance.rippleCreate).toHaveBeenCalledTimes(1);
-});
-
-test('Removes the ripple if the prop changes', () => {
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
-  const instance = wrapper.instance();
-  const expected = undefined;
-
-  wrapper.setProps({ rippleEnabled: false });
-  const actual = instance.rippleFoundation;
-
-  expect(actual).toBe(expected);
-});
-
-test('Updates classNames in state when \'updateClassNames()\' is called', () => {
-  const CLASS_NAMES = ['CLASS_NAME'];
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  const expected = CLASS_NAMES;
-
-  instance.updateClassNames(CLASS_NAMES);
-  const actual = instance.state.classNames;
-
-  expect(actual).toEqual(expected);
-});
-
-test('Updates classNamesRipple in state when \'updateClassNamesRipple()\' is called', () => {
-  const CLASS_NAMES_RIPPLE = ['CLASS_NAME_RIPPLE'];
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  const expected = CLASS_NAMES_RIPPLE;
-
-  instance.updateClassNamesRipple(CLASS_NAMES_RIPPLE);
-  const actual = instance.state.classNamesRipple;
-
-  expect(actual).toEqual(expected);
-});
-
-test('Does not update classNames in state when \'updateClassNames()\' is called on an unmounted component', () => {
-  const CLASS_NAMES = ['CLASS_NAME'];
-  const wrapper = shallow(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
-  const instance = wrapper.instance();
-  instance.setState = jest.fn();
-
-  instance.componentIsMounted = false;
-  instance.updateClassNames(CLASS_NAMES);
-
-  expect(instance.setState).toHaveBeenCalledTimes(0);
-});
-
-test('Does not update classNamesRipple in state when \'updateClassNamesRipple()\' is called on an unmounted component', () => {
-  const CLASS_NAMES_RIPPLE = ['CLASS_NAME_RIPPLE'];
-  const wrapper = shallow(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
-  const instance = wrapper.instance();
-  instance.setState = jest.fn();
-
-  instance.componentIsMounted = false;
-  instance.updateClassNamesRipple(CLASS_NAMES_RIPPLE);
-
-  expect(instance.setState).toHaveBeenCalledTimes(0);
-});
-
-test('Updates cssVariables in state when \'updateCssVariables()\' is called', () => {
-  const CSS_VARIABLES = ['CSS_VARIABLE'];
-  const wrapper = mount(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
-  const instance = wrapper.instance();
-  const expected = CSS_VARIABLES;
-
-  instance.updateCssVariables(CSS_VARIABLES);
-  const actual = instance.state.cssVariables;
-
-  expect(actual).toEqual(expected);
-});
-
-test('Does not update cssVariables in state when \'updateCssVariables()\' is called on an unmounted component', () => {
-  const CSS_VARIABLES = ['CSS_VARIABLE'];
-  const wrapper = mount(<Checkbox name={NAME} />, { disableLifecycleMethods: true });
-  const instance = wrapper.instance();
-  instance.setState = jest.fn();
-
-  instance.componentIsMounted = false;
-  instance.updateCssVariables(CSS_VARIABLES);
-
-  expect(instance.setState).toHaveBeenCalledTimes(0);
-});
-
-test('Destroys the ripple when the component unmounts', () => {
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
-  const instance = wrapper.instance();
-  instance.rippleDestroy = jest.fn();
-
-  wrapper.unmount();
-
-  expect(instance.rippleDestroy).toHaveBeenCalledTimes(1);
-});
-
-test('Does not detroy the ripple when the component unmounts without a ripple', () => {
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  instance.rippleDestroy = jest.fn();
-
-  wrapper.unmount();
-
-  expect(instance.rippleDestroy).toHaveBeenCalledTimes(0);
-});
-
-test('Activates the ripple if it is enabled', () => {
-  const activate = jest.fn();
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
-  const instance = wrapper.instance();
-  const expected = 1;
-  instance.rippleFoundation = { activate };
-
-  instance.rippleActivate();
-  const actual = activate.mock.calls.length;
-
-  expect(actual).toBe(expected);
-});
-
-test('Does not activate the ripple if it is disabled', () => {
-  const activate = jest.fn();
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  const expected = 0;
-  instance.rippleFoundation = { activate };
-
-  instance.rippleActivate();
-  const actual = activate.mock.calls.length;
-
-  expect(actual).toBe(expected);
-});
-
-test('Deactivates the ripple if it is enabled', () => {
-  const deactivate = jest.fn();
-  const wrapper = mount(<Checkbox name={NAME} rippleEnabled />);
-  const instance = wrapper.instance();
-  const expected = 1;
-  instance.rippleFoundation = { deactivate };
-
-  instance.rippleDeactivate();
-  const actual = deactivate.mock.calls.length;
-
-  expect(actual).toBe(expected);
-});
-
-test('Does not deactivate the ripple if it is disabled', () => {
-  const deactivate = jest.fn();
-  const wrapper = mount(<Checkbox name={NAME} />);
-  const instance = wrapper.instance();
-  const expected = 0;
-  instance.rippleFoundation = { deactivate };
-
-  instance.rippleDeactivate();
-  const actual = deactivate.mock.calls.length;
-
-  expect(actual).toBe(expected);
+  expect(actualCheckbox).toBe(expectedCheckbox);
+  expect(actualFormField).toBe(expectedFormField);
 });
