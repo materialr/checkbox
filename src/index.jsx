@@ -49,7 +49,7 @@ class Checkbox extends React.Component {
       >
         <div
           className={getClassNames()}
-          ref={(elementRoot) => { this.elementRoot = elementRoot; }}
+          ref={(elementCheckbox) => { this.elementCheckbox = elementCheckbox; }}
         >
           <input
             className="mdc-checkbox__native-control"
