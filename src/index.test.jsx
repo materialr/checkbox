@@ -136,3 +136,16 @@ test('Destroys the MDCFormField component on unmount', () => {
   expect(actualCheckbox).toBe(expectedCheckbox);
   expect(actualFormField).toBe(expectedFormField);
 });
+
+test('Passes in additional props', () => {
+  const DATA_QA = 'DATA_QA';
+  const wrapper = shallow(
+    <Checkbox data-qa={DATA_QA} label={LABEL} />,
+    { disableLifecycleMethods: true },
+  );
+  const expected = DATA_QA;
+
+  const actual = wrapper.props()['data-qa'];
+
+  expect(actual).toBe(expected);
+});
