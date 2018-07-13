@@ -53,6 +53,7 @@ test('Generates a unique id per instance if none is given', () => {
 });
 
 test('Passes through the correct props', () => {
+  const CHECKED = true;
   const DISABLED = true;
   const NAME = 'NAME';
   const ON_BLUR = () => 'ON_BLUR';
@@ -62,6 +63,7 @@ test('Passes through the correct props', () => {
   const ON_FOCUS = () => 'ON_FOCUS';
   const wrapper = shallow(
     <Checkbox
+      checked={CHECKED}
       disabled={DISABLED}
       label={LABEL}
       name={NAME}
@@ -73,6 +75,7 @@ test('Passes through the correct props', () => {
     />,
     { disableLifecycleMethods: true },
   );
+  const expectedChecked = CHECKED;
   const expectedDisabled = DISABLED;
   const expectedLabel = LABEL;
   const expectedName = NAME;
@@ -83,6 +86,7 @@ test('Passes through the correct props', () => {
   const expectedOnFocus = ON_FOCUS;
 
   const inputProps = wrapper.find('input').props();
+  const actualChecked = inputProps.checked;
   const actualDisabled = inputProps.disabled;
   const actualLabel = wrapper.find('label').props().children;
   const actualName = inputProps.name;
@@ -92,6 +96,7 @@ test('Passes through the correct props', () => {
   const actualOnDrop = inputProps.onDrop;
   const actualOnFocus = inputProps.onFocus;
 
+  expect(actualChecked).toBe(expectedChecked);
   expect(actualDisabled).toBe(expectedDisabled);
   expect(actualLabel).toBe(expectedLabel);
   expect(actualName).toBe(expectedName);

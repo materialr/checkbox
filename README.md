@@ -32,6 +32,7 @@ import Checkbox from '@materialr/checkbox';
 
 | Prop          | Type    | Required | Default    | Description                             |
 | ------------- | ------- | -------- | ---------- | --------------------------------------- |
+| `checked`     | bool    | No       | undefined  | Whether the checkbox is checked         |
 | `className`   | string  | No       | undefined  | Additional classNames to add            |
 | `disabled`    | bool    | No       | false      | Whether the checkbox is disabled        |
 | `id`          | string  | No       | `uuidv1()` | The id to add to the label and checkbox |
