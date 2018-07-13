@@ -41,6 +41,7 @@ class Checkbox extends React.Component {
       getClassNames,
       getId,
       props: {
+        checked,
         className,
         disabled,
         id,
@@ -65,6 +66,7 @@ class Checkbox extends React.Component {
           ref={(elementCheckbox) => { this.elementCheckbox = elementCheckbox; }}
         >
           <input
+            checked={checked}
             className="mdc-checkbox__native-control"
             disabled={disabled}
             id={getId()}
@@ -96,6 +98,7 @@ class Checkbox extends React.Component {
 }
 
 Checkbox.propTypes = {
+  checked: PropTypes.bool,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
@@ -109,6 +112,7 @@ Checkbox.propTypes = {
 };
 
 Checkbox.defaultProps = {
+  checked: undefined,
   className: undefined,
   disabled: false,
   id: undefined,
